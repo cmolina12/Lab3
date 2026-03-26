@@ -64,21 +64,24 @@ int main(int argc, char* argv[]) {
         "Fin del partido. Resultado: Local 2 - Visitante 1"
     };
 
-    for (size_t i = 0; i < eventos.size(); i++) {
-        std::string msg = "PUB|" + tema + "|" + eventos[i];
+    while (true){
+        for (size_t i = 0; i < eventos.size(); i++) {
+            std::string msg = "PUB|" + tema + "|" + eventos[i];
 
-        // sendto(): el datagrama se envía UNA VEZ.
-        // Si se pierde en la red, nadie lo sabe. "Fire and forget".
-        ssize_t sent = sendto(sock, msg.c_str(), msg.size(), 0,
-                              (struct sockaddr*)&broker_addr, sizeof(broker_addr));
+            // sendto(): el datagrama se envía UNA VEZ.
+            // Si se pierde en la red, nadie lo sabe. "Fire and forget".
+            ssize_t sent = sendto(sock, msg.c_str(), msg.size(), 0,
+                                (struct sockaddr*)&broker_addr, sizeof(broker_addr));
 
-        if (sent < 0) {
-            perror("Error enviando mensaje");
-            break;
+            if (sent < 0) {
+                perror("Error enviando mensaje");
+                break;
+            }
+
+            std::cout << "[PUB -> BROKER] " << eventos[i] << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(2));
         }
 
-        std::cout << "[PUB -> BROKER] " << eventos[i] << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(2));
     }
 
     std::cout << "[PUBLISHER UDP] Transmisión finalizada." << std::endl;
